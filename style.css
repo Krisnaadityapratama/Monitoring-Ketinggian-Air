@@ -1,0 +1,177 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: #1e1e1e;
+  color: #000;
+}
+
+.container {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  background-color: #fff;
+  padding: 20px;
+  box-sizing: border-box;
+  min-height: 100vh;
+}
+
+.title {
+  text-align: center;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.box {
+  border: 2px solid #007bff;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.info h3 {
+  margin: 0 0 10px;
+}
+
+.alamat {
+  margin: 0 0 10px;
+  font-size: 14px;
+}
+
+.pin {
+  margin-right: 5px;
+  font-size: 16px;
+}
+
+.sensor1 {
+  color: #8463ff;
+}
+
+.sensor2 {
+  color: #64c8c8;
+}
+
+.box-container {
+  display: flex;
+  gap: 200px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+  justify-content: center;
+}
+
+.status-box {
+  border: none;
+  border-radius: 10px;
+  padding: 20px;
+  width: 200px;
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin: 4px 0;
+  font-size: 14px;
+}
+
+.tampilan-sensor1,
+.tampilan-sensor2 {
+  border: none;
+  border-radius: 10px;
+  padding: 20px;
+  width: 100px;
+  height: 100px;
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin: 4px 0;
+  font-size: 14px;
+}
+
+.status-box h3 {
+  font-size: 18px;
+  margin-bottom: 15px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.date-picker-wrapper {
+  position: absolute;
+  top: -10px;
+  right: 20px;
+}
+
+.date-picker-button {
+  font-size: 13px;
+  padding: 6px 12px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #333;
+}
+
+.box.himbauan {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  width: 50%;
+}
+
+.himbauan h4 {
+  font-size: 18px;
+  color: #e74c3c;
+}
+
+.himbauan p {
+  font-size: 14px;
+  color: #555;
+}
+
+.dot {
+  height: 10px;
+  width: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.red {
+  background-color: red;
+}
+
+.orange {
+  background-color: orange;
+}
+
+.yellow {
+  background-color: yellow;
+}
+
+.green {
+  background-color: green;
+}
+
+#myChart {
+  width: 70%;
+  height: 600px !important;
+  margin-top: 10px;
+}
+
+.label-bulan {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background-color: #eee;
+  padding: 4px 10px;
+  font-size: 12px;
+  border-radius: 5px;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+}
+
+.himbauan h4 {
+  margin: 0 0 10px;
+}
+
+.himbauan p {
+  font-size: 14px;
+  margin: 0;
+}

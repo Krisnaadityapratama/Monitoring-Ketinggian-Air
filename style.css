@@ -11,22 +11,22 @@ body {
   max-width: 1440px;
   margin: 0 auto;
   background-color: #fff;
-  padding: 20px;
+  padding: 10px;
   box-sizing: border-box;
   min-height: 100vh;
 }
 
 .title {
   text-align: center;
-  font-size: 24px;
+  font-size: 18px;
   margin-bottom: 20px;
 }
 
 .box {
   border: 2px solid #007bff;
   border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 20px;
+  padding: 10px;
+  margin-bottom: 1;
   position: relative;
 }
 
@@ -34,58 +34,54 @@ body {
   margin: 0 0 10px;
 }
 
-.alamat {
-  margin: 0 0 10px;
-  font-size: 14px;
-}
-
-.pin {
-  margin-right: 5px;
-  font-size: 16px;
-}
-
-.sensor1 {
-  color: #8463ff;
-}
-
-.sensor2 {
-  color: #64c8c8;
-}
-
 .box-container {
   display: flex;
-  gap: 200px;
+  gap: 10px;
   flex-wrap: wrap;
   margin-top: 20px;
   justify-content: center;
+  flex-direction: row;
+  align-items: flex-start;
 }
 
 .status-box {
   border: none;
   border-radius: 10px;
-  padding: 20px;
+  padding: 10px;
   width: 200px;
+  height: auto;
   background-color: #f9f9f9;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   margin: 4px 0;
-  font-size: 14px;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.status-box h3 {
+  font-size: 18px;
+  margin-bottom: 15px;
+  text-align: center;
+  font-weight: bold;
 }
 
 .tampilan-sensor1,
 .tampilan-sensor2 {
   border: none;
   border-radius: 10px;
-  padding: 20px;
-  width: 100px;
-  height: 100px;
+  padding: 16px 10px;
+  width: 200px;
+  height: auto;
   background-color: #f9f9f9;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   margin: 4px 0;
   font-size: 14px;
+  text-align: center;
+  flex-shrink: 0;
 }
 
-.status-box h3 {
-  font-size: 18px;
+.tampilan-sensor1 h3,
+.tampilan-sensor2 h3 {
+  font-size: 14px;
   margin-bottom: 15px;
   text-align: center;
   font-weight: bold;
@@ -105,25 +101,6 @@ body {
   border-radius: 6px;
   cursor: pointer;
   color: #333;
-}
-
-.box.himbauan {
-  margin-top: 20px;
-  padding: 15px;
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  width: 50%;
-}
-
-.himbauan h4 {
-  font-size: 18px;
-  color: #e74c3c;
-}
-
-.himbauan p {
-  font-size: 14px;
-  color: #555;
 }
 
 .dot {
@@ -151,27 +128,40 @@ body {
 }
 
 #myChart {
-  width: 70%;
-  height: 600px !important;
-  margin-top: 10px;
+  width: 48%;
+  height: 400px !important;
 }
 
-.label-bulan {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background-color: #eee;
-  padding: 4px 10px;
-  font-size: 12px;
-  border-radius: 5px;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+.left-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chart-wrapper {
+  flex: 1;
+  position: relative;
+  width: 100%;
+  height: auto;
+}
+
+.himbauan {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  width: 50%;
 }
 
 .himbauan h4 {
   margin: 0 0 10px;
+  font-size: 14px;
+  color: #e74c3c;
 }
 
 .himbauan p {
-  font-size: 14px;
+  font-size: 12px;
   margin: 0;
+  color: #555;
 }

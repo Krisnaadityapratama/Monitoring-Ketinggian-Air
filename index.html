@@ -1,164 +1,171 @@
 <!DOCTYPE html>
 <html lang="id">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Monitoring Ketinggian Sungai Belik</title>
     <link rel="stylesheet" href="style.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     />
     <script type="module">
-        // Import the functions you need from the Firebase SDK
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+      // Import the functions you need from the Firebase SDK
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+      import {
+        getDatabase,
+        ref,
+        onValue,
+      } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
-        // Your web app's Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyDQtLhFVJf_yvbNeX_gCNC7rX6Y-CZR6_8",
-            authDomain: "ketinggian-air-25d6c.firebaseapp.com",
-            databaseURL: "https://ketinggian-air-25d6c-default-rtdb.firebaseio.com",
-            projectId: "ketinggian-air-25d6c",
-            storageBucket: "ketinggian-air-25d6c.firebasestorage.app",
-            messagingSenderId: "392899879241",
-            appId: "1:392899879241:web:7d262ea5dc461ef6983a98"
-        };
+      // Your web app's Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyB7rNwfUKcAXbyXcCtjLLmDrrto4-3mJjM",
+        authDomain: "ketinggian-air-sungai-belik.firebaseapp.com",
+        databaseURL:
+          "https://ketinggian-air-sungai-belik-default-rtdb.firebaseio.com",
+        projectId: "ketinggian-air-sungai-belik",
+        storageBucket: "ketinggian-air-sungai-belik.firebasestorage.app",
+        messagingSenderId: "532266336728",
+        appId: "1:532266336728:web:a5b12c147a04395ef4b2ad",
+        measurementId: "G-4G03RTETYL",
+      };
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const database = getDatabase(app);
 
-        // Inisialisasi Chart.js
-        const ctx = document.getElementById("myChart").getContext("2d");
-        const myChart = new Chart(ctx, {
-            type: "line",
-            data: {
-                labels: [
-                    "07:00",
-                    "08:00",
-                    "09:00",
-                    "10:00",
-                    "11:00",
-                    "12:00",
-                    "13:00",
-                    "14:00",
-                    "15:00",
-                ],
-                datasets: [
-                    {
-                        label: "Sensor 1",
-                        data: [],
-                        borderColor: "rgba(132, 99, 255, 1)",
-                        borderWidth: 2,
-                        fill: false,
-                    },
-                    {
-                        label: "Sensor 2",
-                        data: [],
-                        borderColor: "rgba(100, 200, 200, 1)",
-                        borderWidth: 2,
-                        fill: false,
-                    },
-                ],
+      // Inisialisasi Chart.js
+      const ctx = document.getElementById("myChart").getContext("2d");
+      const myChart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: [
+            "07:00",
+            "08:00",
+            "09:00",
+            "10:00",
+            "11:00",
+            "12:00",
+            "13:00",
+            "14:00",
+            "15:00",
+          ],
+          datasets: [
+            {
+              label: "Sensor 1",
+              data: [],
+              borderColor: "rgba(132, 99, 255, 1)",
+              borderWidth: 2,
+              fill: false,
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        title: {
-                            display: true,
-                            text: "Ketinggian cm",
-                        },
-                        beginAtZero: false,
-                        min: 0,
-                        max: 200,
-                    },
-                },
+            {
+              label: "Sensor 2",
+              data: [],
+              borderColor: "rgba(100, 200, 200, 1)",
+              borderWidth: 2,
+              fill: false,
             },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              title: {
+                display: true,
+                text: "Ketinggian cm",
+              },
+              beginAtZero: false,
+              min: 0,
+              max: 200,
+            },
+          },
+        },
+      });
+
+      // Ambil data dari Firebase
+      function getData() {
+        const dataRef = ref(database, "dataSensor");
+        onValue(dataRef, (snapshot) => {
+          const data = snapshot.val();
+          const sensor1Data = data && data.sensor1 ? data.sensor1 : 0;
+          const sensor2Data = data && data.sensor2 ? data.sensor2 : 0;
+
+          // Update tampilan ketinggian
+          document.querySelector(
+            ".tampilan-sensor1 p"
+          ).innerText = `${sensor1Data} cm`;
+          document.querySelector(
+            ".tampilan-sensor2 p"
+          ).innerText = `${sensor2Data} cm`;
+
+          // Update data untuk grafik
+          myChart.data.datasets[0].data.push(sensor1Data);
+          myChart.data.datasets[1].data.push(sensor2Data);
+          myChart.update();
         });
+      }
 
-        // Ambil data dari Firebase
-        function getData() {
-            const dataRef = ref(database, 'dataSensor');
-            onValue(dataRef, (snapshot) => {
-                const data = snapshot.val();
-                const sensor1Data = data && data.sensor1 ? data.sensor1 : 0;
-                const sensor2Data = data && data.sensor2 ? data.sensor2 : 0;
-
-                // Update tampilan ketinggian
-                document.querySelector('.tampilan-sensor1 p').innerText = `${sensor1Data} cm`;
-                document.querySelector('.tampilan-sensor2 p').innerText = `${sensor2Data} cm`;
-
-                // Update data untuk grafik
-                myChart.data.datasets[0].data.push(sensor1Data);
-                myChart.data.datasets[1].data.push(sensor2Data);
-                myChart.update();
-            });
-        }
-
-        // Panggil fungsi getData
-        getData();
+      // Panggil fungsi getData
+      getData();
     </script>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <h1 class="title">Monitoring Ketinggian Sungai Belik</h1>
-        <div class="box">
-            <div class="info">
-                <h3>Kondisi Real-Time</h3>
-                <p class="alamat">
-                    <i class="fa-solid fa-location-dot pin sensor1"></i> Jl. Kali Belik
-                    Sagan, Yogyakarta
-                </p>
-                <p class="alamat">
-                    <i class="fa-solid fa-location-dot pin sensor2"></i> Samirono,
-                    Caturtunggal, Kec. Depok, Kabupaten Sleman, Yogyakarta
-                </p>
-                <div class="box-container">
-                    <div class="status-box">
-                        <h3>Status</h3>
-                        <p><span class="dot red"></span> SIAGA 1: > 170 cm</p>
-                        <p><span class="dot orange"></span> SIAGA 2: 140 - 170 cm</p>
-                        <p><span class="dot yellow"></span> SIAGA 3: 100 - 140 cm</p>
-                        <p><span class="dot green"></span> NORMAL</p>
-                    </div>
-                    <div class="tampilan-sensor1">
-                        <h3>Ketinggian Sensor 1</h3>
-                        <p>50 cm</p>
-                    </div>
-                    <div class="tampilan-sensor2">
-                        <h3>Ketinggian Sensor 2</h3>
-                        <p>70 cm</p>
-                    </div>
-                    <div style="position: relative">
-                        <canvas id="myChart"></canvas>
-                        <div class="date-picker-wrapper">
-                            <button class="date-picker-button" id="datePickerBtn">
-                                Januari 2025
-                            </button>
-                            <input
-                                type="month"
-                                id="hiddenDateInput"
-                                style="display: none"
-                            />
-                        </div>
-                    </div>
-                </div>
+      <h1 class="title">
+        Monitoring Ketinggian Sungai Belik <br />
+        Di Desa Sagan Caturtunggal Depok Sleman Yogyakarta
+      </h1>
+      <div class="box">
+        <div class="info">
+          <div class="box-container">
+            <div class="left-content">
+              <div class="status-box">
+                <h3>Status</h3>
+                <p><span class="dot red"></span> SIAGA 1: > 170 cm</p>
+                <p><span class="dot orange"></span> SIAGA 2: 140 - 170 cm</p>
+                <p><span class="dot yellow"></span> SIAGA 3: 100 - 140 cm</p>
+                <p><span class="dot green"></span> NORMAL</p>
+              </div>
+              <div class="tampilan-sensor1">
+                <h3>Jl. Kali Belik Sagan</h3>
+                <p>50 cm</p>
+              </div>
+              <div class="tampilan-sensor2">
+                <h3>Jl. Melati</h3>
+                <p>70 cm</p>
+              </div>
             </div>
+
+            <div class="chart-wrapper" style="position: relative">
+              <canvas id="myChart"></canvas>
+              <div class="date-picker-wrapper">
+                <button class="date-picker-button" id="datePickerBtn">
+                  Januari 2025
+                </button>
+                <input
+                  type="month"
+                  id="hiddenDateInput"
+                  style="display: none"
+                />
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="box himbauan">
-            <h4>Himbauan!!</h4>
-            <p>
-                Status saat ini <strong>AMAN</strong>, tidak ada peningkatan debit air
-                yang signifikan. Warga dapat beraktivitas seperti biasa, namun tetap
-                disarankan untuk memantau ketinggian air secara real-time melalui
-                website dan Telegram. Untuk informasi lebih lanjut atau tindakan
-                darurat, harap mengikuti arahan resmi dari BPBD setempat.
-            </p>
-        </div>
+      </div>
+      <div class="himbauan">
+        <h4>Himbauan!!</h4>
+        <p>
+          Status saat ini <strong>AMAN</strong>, tidak ada peningkatan debit air
+          yang signifikan. Warga dapat beraktivitas seperti biasa, namun tetap
+          disarankan untuk memantau ketinggian air secara real-time melalui
+          website dan Telegram. Untuk informasi lebih lanjut atau tindakan
+          darurat, harap mengikuti arahan resmi dari BPBD setempat.
+        </p>
+      </div>
     </div>
-</body>
+  </body>
 </html>

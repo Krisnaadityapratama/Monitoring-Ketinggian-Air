@@ -7,12 +7,12 @@
 #define WIFI_PASSWORD "1234567899"
 
 // Firebase config krisna
-#define FIREBASE_HOST "https://ketinggian-air-551c0-default-rtdb.firebaseio.com/"
-#define FIREBASE_AUTH "AIzaSyA0c2F8uR1t4PVsQNoTyd27_DfuNnwoSsk" 
+//#define FIREBASE_HOST "https://ketinggian-air-551c0-default-rtdb.firebaseio.com/"
+//#define FIREBASE_AUTH "AIzaSyA0c2F8uR1t4PVsQNoTyd27_DfuNnwoSsk" 
 
 // Firebase config aurell
-// #define FIREBASE_HOST ""
-// #define FIREBASE_AUTH "" 
+ #define FIREBASE_HOST "https://ketinggian-air-sungai-belik-default-rtdb.firebaseio.com/"
+ #define FIREBASE_AUTH "AIzaSyB7rNwfUKcAXbyXcCtjLLmDrrto4-3mJjM" 
 
 // Firebase and WiFi objects
 FirebaseData fbdo;
@@ -20,8 +20,8 @@ FirebaseAuth auth;
 FirebaseConfig config;
 
 // Ultrasonic sensor pins
-#define PIN_TRIG 14
-#define PIN_ECHO 12
+#define PIN_TRIG 12
+#define PIN_ECHO 14
 
 long durasi;
 float cm;

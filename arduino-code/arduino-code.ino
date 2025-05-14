@@ -73,5 +73,5 @@ void loop()
     Serial.println(fbdo.errorReason());
   }
 
-  delay(2000);
+  delay(60000);
 }

@@ -66,12 +66,12 @@ body {
 
 .tampilan-sensor1,
 .tampilan-sensor2 {
+  background-color: #F7F7F7;
   border: none;
   border-radius: 10px;
   padding: 16px 10px;
   width: 200px;
   height: auto;
-  background-color: #f9f9f9;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   margin: 4px 0;
   font-size: 14px;
@@ -85,6 +85,25 @@ body {
   margin-bottom: 15px;
   text-align: center;
   font-weight: bold;
+}
+
+.kalender {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.kalender-button {
+  font-size: 13px;
+  padding: 6px 12px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #333; 
 }
 
 .date-picker-wrapper {
@@ -112,23 +131,23 @@ body {
 }
 
 .red {
-  background-color: red;
+  background-color: #C62828;
 }
 
 .orange {
-  background-color: orange;
+  background-color: #EF6C00;
 }
 
 .yellow {
-  background-color: yellow;
+  background-color: #FBC02D;
 }
 
 .green {
-  background-color: green;
+  background-color: #388E3C;
 }
 
 #myChart {
-  width: 48%;
+  width: 100%;
   height: 400px !important;
 }
 
@@ -145,25 +164,66 @@ body {
   width: 100%;
   height: auto;
   min-width: 400px;
+  overflow-x: auto;
 }
 
 .himbauan {
   margin-top: 20px;
   padding: 10px;
-  background-color: #f9f9f9;
+  background-color: #FFEBEE;
   border: 1px solid #ddd;
   border-radius: 8px;
-  width: 50%;
+  width: 100%;
+  max-width: 800px; /* Atur sesuai kebutuhan */
+  word-wrap: break-word; /* Membuat kata panjang terbungkus */
+  word-break: break-word;
 }
 
 .himbauan h4 {
   margin: 0 0 10px;
   font-size: 14px;
-  color: #e74c3c;
+  color: #C62828;
 }
 
 .himbauan p {
   font-size: 12px;
   margin: 0;
-  color: #555;
+  color: #000000;
+  text-align: justify; /* buat rata kiri-kanan biar lebih rapi */
+  line-height: 1.5; /* tambahkan spasi antar baris */
 }
+
+/* ========= RESPONSIF UNTUK MOBILE ========== */
+@media (max-width: 768px) {
+  .box-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .status-box,
+  .tampilan-sensor1,
+  .tampilan-sensor2 {
+    width: 90%;
+  }
+
+  .chart-wrapper {
+    min-width: unset;
+    width: 100%;
+    height: 300px !important;
+  }
+
+  .himbauan {
+    width: 90%;
+  }
+
+  .kalender {
+    position: static;
+    justify-content: center;
+    margin-top: 10px;
+  }
+
+  .title {
+    font-size: 16px;
+    padding: 0 10px;
+  }
+} 

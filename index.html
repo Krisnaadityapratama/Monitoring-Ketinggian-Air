@@ -31,7 +31,7 @@
       const app = initializeApp(firebaseConfig);
       const database = getDatabase(app);
 
-      // Inisialisasi Chart.js
+      // Inisialisasi Chart.js (untuk grafik)
       const ctx = document.getElementById("myChart").getContext("2d");
       const myChart = new Chart(ctx, {
         type: "line",
@@ -41,8 +41,9 @@
             {
               label: "Sensor 1",
               data: [],
-              borderColor: "rgba(132, 99, 255, 1)",
-              borderWidth: 2,
+              borderColor: "#1565C0", // atau gunakan "#6A1B9A" untuk ungu gelap
+              backgroundColor: "#1565C0",
+              pointBackgroundColor: "#1565C0", // warna titik
               fill: false,
             }
           ],
@@ -73,6 +74,9 @@
           // Tampilkan di UI (dibulatkan 2 desimal)
           document.querySelector(".tampilan-sensor1 p").innerText = `${sensor1Data.toFixed(2)} cm`;
 
+           // Update himbauan berdasarkan data terkini
+           updateHimbauan(sensor1Data);
+
           // Tambahkan waktu & data ke grafik
           const now = new Date();
           const timeLabel = now.toLocaleTimeString("id-ID", {
@@ -94,14 +98,14 @@
       // Jalankan fungsi
       getData();
     </script>
-  </head>
-  
+  </head>  
   <body>
     <div class="container">
       <h1 class="title">
         Monitoring Ketinggian Sungai Belik <br />
         Di Desa Sagan Caturtunggal Depok Sleman Yogyakarta
       </h1>
+      <!-- box biru -->
       <div class="box">
         <div class="info">
           <div class="box-container">
@@ -113,26 +117,59 @@
                 <p><span class="dot yellow"></span> SIAGA 3: 100 - 140 cm</p>
                 <p><span class="dot green"></span> NORMAL</p>
               </div>
-              <div class="tampilan-sensor1">
-                <h3>Jl. Kali Belik Sagan</h3>
+              <div class="tampilan-sensor1"onclick="openMap()" style="cursor: pointer;">
+                <h3>Jl. Kampung Purbonegaran</h3>
                 <p>-- cm</p>
               </div>
+             <script>
+              function openMap() {
+                // Ganti alamat di sini jika perlu
+                const alamat = "Jalan Kampung Purbonegaran GK5/1267, Terban, Kota Yogyakarta, Daerah Istimewa Yogyakarta";
+                const url = "https://www.google.com/maps/place/Mie+Ayam+Ceker+%26+Angkingan+Sunarno/@-7.7816346,110.3806092,20z/data=!4m14!1m7!3m6!1s0x2e7a590019d3a2d3:0xe61a6d7bf464d7b5!2sMie+Ayam+Ceker+%26+Angkingan+Sunarno!8m2!3d-7.7816161!4d110.3806116!16s%2Fg%2F11vs6gdz9m!3m5!1s0x2e7a590019d3a2d3:0xe61a6d7bf464d7b5!8m2!3d-7.7816161!4d110.3806116!16s%2Fg%2F11vs6gdz9m!5m2!1e4!1e2?entry=ttu&g_ep=EgoyMDI1MDUxNS4wIKXMDSoJLDEwMjExNDUzSAFQAw%3D%3D" + encodeURIComponent(alamat);
+                window.open(url, "_blank");
+              }
+            </script> 
             </div>
+            <!-- Kalender -->
+            <div class="kalender">
+                <input type="date" id="tanggalPicker" />
+                <button onclick="loadHistory()">Tampilkan</button>
+            </div>
+            
             <div class="chart-wrapper">
               <canvas id="myChart"></canvas>
             </div>
           </div>
         </div>
       </div>
+
+      <!-- HImbauan -->
       <div class="himbauan">
-        <h4>Himbauan!!</h4>
-        <p>
-          Status saat ini <strong>AMAN</strong>, tidak ada peningkatan debit air
-          yang signifikan. Warga dapat beraktivitas seperti biasa, namun tetap
-          disarankan untuk memantau ketinggian air secara real-time melalui
-          website dan Telegram. Untuk informasi lebih lanjut atau tindakan
-          darurat, harap mengikuti arahan resmi dari BPBD setempat.
-        </p>
+      <h4>⚠️ Himbauan!!</h4>
+        <p id="himbauanText"></p>
+        <script>
+          function updateHimbauan(currentHeight) {
+            const himbauan = document.getElementById("himbauanText");
+            let status = "";
+            let isiPesan = "";
+
+              if (currentHeight > 170) {
+                status = "SIAGA 1 (BAHAYA)";
+                isiPesan = `Status saat ini <b>${status}</b>, ketinggian air berada pada level kritis dan berpotensi menyebabkan banjir. Segera lakukan evakuasi mandiri jika berada di wilayah rawan. Ikuti instruksi dan peringatan resmi dari BPBD atau petugas terkait. Tetap tenang, namun bertindak cepat dan waspada.`;
+              } else if (currentHeight >= 140) {
+                status = "SIAGA 2 (WASPADA)";
+                isiPesan = `Status saat ini <b>${status}</b>, debit air mengalami peningkatan signifikan. Warga diminta waspada dan bersiap jika sewaktu-waktu harus mengungsi, terutama yang berada di zona rawan banjir. Segera amankan dokumen penting dan barang berharga. Pantau perkembangan melalui website, Telegram, dan informasi dari BPBD setempat.`;
+              } else if (currentHeight >= 100) {
+                status = "SIAGA 3 (WASPADA RINGAN)";
+                isiPesan = `Status saat ini <b>${status}</b>, terjadi sedikit peningkatan debit air sungai. Warga diimbau untuk mulai meningkatkan kewaspadaan, terutama bagi yang tinggal di dekat bantaran sungai. Pantau perkembangan ketinggian air secara berkala melalui website dan Telegram. Ikuti arahan resmi dari BPBD setempat jika terjadi perubahan status lebih lanjut.`;
+              } else {
+                status = "NORMAL";
+                isiPesan = `Status saat ini <b>${status}</b>, tidak ada peningkatan debit air yang signifikan. Warga dapat beraktivitas seperti biasa. Namun, tetap disarankan untuk memantau ketinggian air secara real-time melalui website dan Telegram. Untuk informasi lebih lanjut atau tindakan darurat, harap mengikuti arahan resmi dari BPBD setempat.`;
+              }
+
+              himbauan.innerHTML = isiPesan;
+            }
+        </script>
       </div>
     </div>
   </body>

@@ -1,8 +1,8 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 
-const char* ssid = "Aurell_Arine";
-const char* password = "aurellarine";
+const char* ssid = "test";
+const char* password = "12345678";
 
 String botToken = "7323920625:AAHieSajecgla0UCAqQ9GrT-shyIDypWBr8";
 String chatID = "6456563480";

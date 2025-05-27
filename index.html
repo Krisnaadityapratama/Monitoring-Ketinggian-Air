@@ -41,9 +41,17 @@
             {
               label: "Sensor 1",
               data: [],
-              borderColor: "#1565C0", // atau gunakan "#6A1B9A" untuk ungu gelap
+              borderColor: "#1565C0", 
               backgroundColor: "#1565C0",
               pointBackgroundColor: "#1565C0", // warna titik
+              fill: false,
+            },
+            {
+              label: "Sensor 2",
+              data: [],
+              borderColor: "#6A1B9A", 
+              backgroundColor: "#6A1B9A",
+              pointBackgroundColor: "#6A1B9A", // warna titik
               fill: false,
             }
           ],
@@ -65,8 +73,9 @@
         },
       });
 
-      // Ambil data dari root -> Sensor1
+      // Ambil data dari root 
       function getData() {
+        // Sensor 1
         const sensor1Ref = ref(database, "Sensor1");
         onValue(sensor1Ref, (snapshot) => {
           const sensor1Data = snapshot.val();
@@ -93,6 +102,19 @@
           myChart.data.datasets[0].data.push(sensor1Data);
           myChart.update();
         });
+        // Sensor 2
+          const sensor2Ref = ref(database, "Sensor2");
+          onValue(sensor2Ref, (snapshot) => {
+          const sensor2Data = snapshot.val();
+
+            // Tampilkan di UI
+          document.querySelector(".tampilan-sensor2 p").innerText = `${sensor2Data.toFixed(2)} cm`;
+
+          if (myChart.data.datasets[1].data.length >= myChart.data.labels.length) return;
+
+          myChart.data.datasets[1].data.push(sensor2Data);
+          myChart.update();
+        });
       }
 
       // Jalankan fungsi
@@ -102,8 +124,7 @@
   <body>
     <div class="container">
       <h1 class="title">
-        Monitoring Ketinggian Sungai Belik <br />
-        Di Desa Sagan Caturtunggal Depok Sleman Yogyakarta
+        Monitoring Ketinggian Sungai Belik <br />Di Desa Sagan Caturtunggal Depok Sleman Yogyakarta
       </h1>
       <!-- box biru -->
       <div class="box">
@@ -117,27 +138,64 @@
                 <p><span class="dot yellow"></span> SIAGA 3: 100 - 140 cm</p>
                 <p><span class="dot green"></span> NORMAL</p>
               </div>
-              <div class="tampilan-sensor1"onclick="openMap()" style="cursor: pointer;">
+              <!-- Tampilan sensor -->
+              <div class="tampilan-sensor1"onclick="openMap('purbonegaran')" style="cursor: pointer;">
                 <h3>Jl. Kampung Purbonegaran</h3>
                 <p>-- cm</p>
               </div>
-             <script>
-              function openMap() {
-                // Ganti alamat di sini jika perlu
-                const alamat = "Jalan Kampung Purbonegaran GK5/1267, Terban, Kota Yogyakarta, Daerah Istimewa Yogyakarta";
-                const url = "https://www.google.com/maps/place/Mie+Ayam+Ceker+%26+Angkingan+Sunarno/@-7.7816346,110.3806092,20z/data=!4m14!1m7!3m6!1s0x2e7a590019d3a2d3:0xe61a6d7bf464d7b5!2sMie+Ayam+Ceker+%26+Angkingan+Sunarno!8m2!3d-7.7816161!4d110.3806116!16s%2Fg%2F11vs6gdz9m!3m5!1s0x2e7a590019d3a2d3:0xe61a6d7bf464d7b5!8m2!3d-7.7816161!4d110.3806116!16s%2Fg%2F11vs6gdz9m!5m2!1e4!1e2?entry=ttu&g_ep=EgoyMDI1MDUxNS4wIKXMDSoJLDEwMjExNDUzSAFQAw%3D%3D" + encodeURIComponent(alamat);
-                window.open(url, "_blank");
-              }
-            </script> 
+              <div class="tampilan-sensor2"onclick="openMap('samirono')" style="cursor: pointer;">
+                <h3>Jl. Samirono</h3>
+                <p>-- cm</p>
+              </div>
+              <script>
+                function openMap(lokasi) {
+                  let url = "";
+
+                  if (lokasi === "purbonegaran") {
+                    url = "https://www.google.com/maps/place/Mie+Ayam+Ceker+%26+Angkingan+Sunarno/@-7.7816103,110.3798358,18z/data=!4m6!3m5!1s0x2e7a590019d3a2d3:0xe61a6d7bf464d7b5!8m2!3d-7.7816161!4d110.3806116!16s%2Fg%2F11vs6gdz9m!5m2!1e2!1e4?entry=ttu&g_ep=EgoyMDI1MDUyMS4wIKXMDSoJLDEwMjExNDUzSAFQAw%3D%3D";
+                  } else if (lokasi === "samirono") {
+                    url = "https://www.google.com/maps/place/GHS+(+Gaming+House+of+Sagan)/@-7.7768642,110.3771764,16.5z/data=!4m6!3m5!1s0x2e7a5935362c9e39:0xeaab2b0e0dcfcfae!8m2!3d-7.7789451!4d110.3807421!16s%2Fg%2F11rxp1lmny!5m2!1e2!1e4?entry=ttu&g_ep=EgoyMDI1MDUyMS4wIKXMDSoJLDEwMjExNDUzSAFQAw%3D%3D";
+                  }
+
+                  window.open(url, "_blank");
+                }
+              </script>
             </div>
             <!-- Kalender -->
             <div class="kalender">
                 <input type="date" id="tanggalPicker" />
                 <button onclick="loadHistory()">Tampilkan</button>
-            </div>
-            
+                <button onclick="downloadChartImage()">Download (.png)</button>
+                <button onclick="downloadCSV()">Download (.csv)</button>
+            </div>            
             <div class="chart-wrapper">
               <canvas id="myChart"></canvas>
+            <!-- kode js buttom download -->
+            <script>
+              function downloadChartImage() {
+                const link = document.createElement("a");
+                link.href = document.getElementById("myChart").toDataURL("image/png");
+                link.download = "grafik-ketinggian-air.png";
+                link.click();
+              }
+
+              function downloadCSV() {
+                const labels = myChart.data.labels;
+                const data1 = myChart.data.datasets[0].data;
+                const data2 = myChart.data.datasets[1].data;
+                let csv = "Waktu,Sensor 1 (cm),Sensor 2 (cm)\n";
+                for (let i = 0; i < labels.length; i++) {
+                csv += `${labels[i]},${data1[i]},${data2[i] ?? ""}\n`;
+                }
+
+                const blob = new Blob([csv], { type: "text/csv" });
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = "data-ketinggian-air.csv";
+                link.click();
+              }
+            </script>
             </div>
           </div>
         </div>
@@ -154,18 +212,18 @@
             let isiPesan = "";
 
               if (currentHeight > 170) {
-                status = "SIAGA 1 (BAHAYA)";
-                isiPesan = `Status saat ini <b>${status}</b>, ketinggian air berada pada level kritis dan berpotensi menyebabkan banjir. Segera lakukan evakuasi mandiri jika berada di wilayah rawan. Ikuti instruksi dan peringatan resmi dari BPBD atau petugas terkait. Tetap tenang, namun bertindak cepat dan waspada.`;
-              } else if (currentHeight >= 140) {
-                status = "SIAGA 2 (WASPADA)";
-                isiPesan = `Status saat ini <b>${status}</b>, debit air mengalami peningkatan signifikan. Warga diminta waspada dan bersiap jika sewaktu-waktu harus mengungsi, terutama yang berada di zona rawan banjir. Segera amankan dokumen penting dan barang berharga. Pantau perkembangan melalui website, Telegram, dan informasi dari BPBD setempat.`;
-              } else if (currentHeight >= 100) {
-                status = "SIAGA 3 (WASPADA RINGAN)";
-                isiPesan = `Status saat ini <b>${status}</b>, terjadi sedikit peningkatan debit air sungai. Warga diimbau untuk mulai meningkatkan kewaspadaan, terutama bagi yang tinggal di dekat bantaran sungai. Pantau perkembangan ketinggian air secara berkala melalui website dan Telegram. Ikuti arahan resmi dari BPBD setempat jika terjadi perubahan status lebih lanjut.`;
-              } else {
-                status = "NORMAL";
-                isiPesan = `Status saat ini <b>${status}</b>, tidak ada peningkatan debit air yang signifikan. Warga dapat beraktivitas seperti biasa. Namun, tetap disarankan untuk memantau ketinggian air secara real-time melalui website dan Telegram. Untuk informasi lebih lanjut atau tindakan darurat, harap mengikuti arahan resmi dari BPBD setempat.`;
-              }
+                 status = "SIAGA 1 (BAHAYA)";
+                 isiPesan = `Status saat ini <b>${status}</b>, ketinggian air berada pada level kritis dan berpotensi menyebabkan banjir. Segera lakukan evakuasi mandiri jika berada di wilayah rawan.`;
+               } else if (currentHeight >= 140) {
+                 status = "SIAGA 2 (WASPADA)";
+                 isiPesan = `Status saat ini <b>${status}</b>, debit air mengalami peningkatan signifikan. Warga diminta waspada dan bersiap jika sewaktu-waktu harus mengungsi.`;
+               } else if (currentHeight >= 100) {
+                 status = "SIAGA 3 (WASPADA RINGAN)";
+                 isiPesan = `Status saat ini <b>${status}</b>, ketinggian air mulai meningkat. Tetap waspada dan ikuti perkembangan informasi.`;
+               } else {
+                 status = "NORMAL";
+                 isiPesan = `Status saat ini <b>${status}</b>, kondisi aman namun tetap jaga kewaspadaan.`;
+               }
 
               himbauan.innerHTML = isiPesan;
             }

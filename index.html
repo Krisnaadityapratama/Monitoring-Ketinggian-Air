@@ -86,12 +86,28 @@
 
 
     function getData() {
-      onValue(ref(db, "Sensor1"), (snap1) => {
-        const sensor1Val = snap1.val();
-        document.querySelector(".tampilan-sensor1 p").innerText = `${sensor1Val.toFixed(2)} cm`;
-        updateHimbauan(1, sensor1Val);
+      const sensorRef = ref(db, "sensor");
 
-        const waktu = new Date().toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit' });
+      let lastSensor1 = null;
+      let lastSensor2 = null;
+
+      onValue(sensorRef, (snapshot) => {
+        const data = snapshot.val();
+        if (!data) return;
+
+        const sensor1Val = parseFloat(data.sensor1) || 0;
+        const sensor2Val = parseFloat(data.sensor2) || 0;
+
+        // Update tampilan
+        document.querySelector(".tampilan-sensor1 p").innerText = `${sensor1Val.toFixed(2)} cm`;
+        document.querySelector(".tampilan-sensor2 p").innerText = `${sensor2Val.toFixed(2)} cm`;
+        updateHimbauan(1, sensor1Val);
+        updateHimbauan(2, sensor2Val);
+
+        const waktu = new Date().toLocaleTimeString("id-ID", {
+          hour: "2-digit",
+          minute: "2-digit"
+        });
 
         if (myChart.data.labels.length > 10) {
           myChart.data.labels.shift();
@@ -101,20 +117,18 @@
 
         myChart.data.labels.push(waktu);
         myChart.data.datasets[0].data.push(sensor1Val);
+        myChart.data.datasets[1].data.push(sensor2Val);
+        myChart.update();
 
-        onValue(ref(db, "Sensor2"), (snap2) => {
-          const sensor2Val = snap2.val();
-          document.querySelector(".tampilan-sensor2 p").innerText = `${sensor2Val.toFixed(2)} cm`;
-          updateHimbauan(2, sensor2Val);
-
-          myChart.data.datasets[1].data.push(sensor2Val);
-          myChart.update();
-
-          // Kirim data ke spreadsheet lewat webhook
+        // Kirim ke Google Sheet hanya jika nilai berubah
+        if (sensor1Val !== lastSensor1 || sensor2Val !== lastSensor2) {
+          lastSensor1 = sensor1Val;
+          lastSensor2 = sensor2Val;
           kirimKeSpreadsheet(sensor1Val, sensor2Val);
-        }, { onlyOnce: true });
+        }
       });
     }
+
 
     getData();
   </script>

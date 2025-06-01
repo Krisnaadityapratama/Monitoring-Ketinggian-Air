@@ -69,7 +69,7 @@
       el.innerHTML = text;
     }
 
-    // Ganti URL ini dengan Web App URL Google Apps Script kamu
+    // Ganti URL ini dengan Web App URL Google Apps Script kamu yang sudah deploy
     const WEBHOOK_URL = "https://monitoring-ketinggian-sungai-belik.vercel.app/api/kirim";
 
     function kirimKeSpreadsheet(sensor1, sensor2) {
@@ -84,39 +84,55 @@
       });
     }
 
+    // Listener Firebase dipisah supaya gak nested dan gak double listener
+    const sensor1Ref = ref(db, "Sensor1");
+    const sensor2Ref = ref(db, "Sensor2");
 
-    function getData() {
-      onValue(ref(db, "Sensor1"), (snap1) => {
-        const sensor1Val = snap1.val();
-        document.querySelector(".tampilan-sensor1 p").innerText = `${sensor1Val.toFixed(2)} cm`;
-        updateHimbauan(1, sensor1Val);
+    let lastSensor1 = null;
+    let lastSensor2 = null;
 
-        const waktu = new Date().toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit' });
+    onValue(sensor1Ref, (snap1) => {
+      const sensor1Val = snap1.val();
+      if (sensor1Val === null) return;
+      document.querySelector(".tampilan-sensor1 p").innerText = `${sensor1Val.toFixed(2)} cm`;
+      updateHimbauan(1, sensor1Val);
 
-        if (myChart.data.labels.length > 10) {
-          myChart.data.labels.shift();
-          myChart.data.datasets[0].data.shift();
-          myChart.data.datasets[1].data.shift();
-        }
+      lastSensor1 = sensor1Val;
+      updateChartAndMaybeSend();
+    });
 
-        myChart.data.labels.push(waktu);
-        myChart.data.datasets[0].data.push(sensor1Val);
+    onValue(sensor2Ref, (snap2) => {
+      const sensor2Val = snap2.val();
+      if (sensor2Val === null) return;
+      document.querySelector(".tampilan-sensor2 p").innerText = `${sensor2Val.toFixed(2)} cm`;
+      updateHimbauan(2, sensor2Val);
 
-        onValue(ref(db, "Sensor2"), (snap2) => {
-          const sensor2Val = snap2.val();
-          document.querySelector(".tampilan-sensor2 p").innerText = `${sensor2Val.toFixed(2)} cm`;
-          updateHimbauan(2, sensor2Val);
+      lastSensor2 = sensor2Val;
+      updateChartAndMaybeSend();
+    });
 
-          myChart.data.datasets[1].data.push(sensor2Val);
-          myChart.update();
+    function updateChartAndMaybeSend() {
+      if (lastSensor1 === null || lastSensor2 === null) return;
 
-          // Kirim data ke spreadsheet lewat webhook
-          kirimKeSpreadsheet(sensor1Val, sensor2Val);
-        }, { onlyOnce: true });
-      });
+      if (myChart.data.labels.length > 10) {
+        myChart.data.labels.shift();
+        myChart.data.datasets[0].data.shift();
+        myChart.data.datasets[1].data.shift();
+      }
+
+      const waktu = new Date().toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit' });
+      myChart.data.labels.push(waktu);
+      myChart.data.datasets[0].data.push(lastSensor1);
+      myChart.data.datasets[1].data.push(lastSensor2);
+      myChart.update();
+
+      kirimKeSpreadsheet(lastSensor1, lastSensor2);
+
+      // reset agar tidak kirim data duplikat sebelum ada update baru
+      lastSensor1 = null;
+      lastSensor2 = null;
     }
 
-    getData();
   </script>
 </head>
 <body>

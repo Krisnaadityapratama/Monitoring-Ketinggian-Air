@@ -1,234 +1,202 @@
 <!DOCTYPE html>
 <html lang="id">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Monitoring Ketinggian Sungai Belik</title>
-    <link rel="stylesheet" href="style.css" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-    />
-    <script type="module">
-      // Import Firebase SDK
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-      import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Monitoring Ketinggian Sungai Belik</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
-      // Konfigurasi Firebase
-      const firebaseConfig = {
-        apiKey: "AIzaSyB7rNwfUKcAXbyXcCtjLLmDrrto4-3mJjM",
-        authDomain: "ketinggian-air-sungai-belik.firebaseapp.com",
-        databaseURL: "https://ketinggian-air-sungai-belik-default-rtdb.firebaseio.com/",
-        projectId: "ketinggian-air-sungai-belik",
-        storageBucket: "ketinggian-air-sungai-belik.firebasestorage.app",
-        messagingSenderId: "532266336728",
-        appId: "1:532266336728:web:a5b12c147a04395ef4b2ad",
-        measurementId: "G-4G03RTETYL",
-      };
+    const firebaseConfig = {
+      apiKey: "AIzaSyB7rNwfUKcAXbyXcCtjLLmDrrto4-3mJjM",
+      authDomain: "ketinggian-air-sungai-belik.firebaseapp.com",
+      databaseURL: "https://ketinggian-air-sungai-belik-default-rtdb.firebaseio.com/",
+      projectId: "ketinggian-air-sungai-belik",
+      storageBucket: "ketinggian-air-sungai-belik.firebasestorage.app",
+      messagingSenderId: "532266336728",
+      appId: "1:532266336728:web:a5b12c147a04395ef4b2ad"
+    };
 
-      // Inisialisasi Firebase
-      const app = initializeApp(firebaseConfig);
-      const database = getDatabase(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-      // Inisialisasi Chart.js (untuk grafik)
-      const ctx = document.getElementById("myChart").getContext("2d");
-      const myChart = new Chart(ctx, {
-        type: "line",
-        data: {
-          labels: [],
-          datasets: [
-            {
-              label: "Sensor 1",
-              data: [],
-              borderColor: "#1565C0", 
-              backgroundColor: "#1565C0",
-              pointBackgroundColor: "#1565C0", // warna titik
-              fill: false,
-            },
-            {
-              label: "Sensor 2",
-              data: [],
-              borderColor: "#6A1B9A", 
-              backgroundColor: "#6A1B9A",
-              pointBackgroundColor: "#6A1B9A", // warna titik
-              fill: false,
-            }
-          ],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: {
-              title: {
-                display: true,
-                text: "Ketinggian (cm)",
-              },
-              beginAtZero: false,
-              min: 0,
-              max: 200,
-            },
+    const ctx = document.getElementById("myChart").getContext("2d");
+    const myChart = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: [],
+        datasets: [
+          {
+            label: "Jl. Kampung Purbonegaran",
+            data: [],
+            borderColor: "#1565C0",
+            fill: false
           },
-        },
-      });
-
-      // Ambil data dari root 
-      function getData() {
-        // Sensor 1
-        const sensor1Ref = ref(database, "Sensor1");
-        onValue(sensor1Ref, (snapshot) => {
-          const sensor1Data = snapshot.val();
-
-          // Tampilkan di UI (dibulatkan 2 desimal)
-          document.querySelector(".tampilan-sensor1 p").innerText = `${sensor1Data.toFixed(2)} cm`;
-
-           // Update himbauan berdasarkan data terkini
-           updateHimbauan(sensor1Data);
-
-          // Tambahkan waktu & data ke grafik
-          const now = new Date();
-          const timeLabel = now.toLocaleTimeString("id-ID", {
-            hour: "2-digit",
-            minute: "2-digit",
-          });
-
-          if (myChart.data.labels.length > 10) {
-            myChart.data.labels.shift();
-            myChart.data.datasets[0].data.shift();
+          {
+            label: "Jl. Samirono",
+            data: [],
+            borderColor: "#6A1B9A",
+            fill: false
           }
-
-          myChart.data.labels.push(timeLabel);
-          myChart.data.datasets[0].data.push(sensor1Data);
-          myChart.update();
-        });
-        // Sensor 2
-          const sensor2Ref = ref(database, "Sensor2");
-          onValue(sensor2Ref, (snapshot) => {
-          const sensor2Data = snapshot.val();
-
-            // Tampilkan di UI
-          document.querySelector(".tampilan-sensor2 p").innerText = `${sensor2Data.toFixed(2)} cm`;
-
-          if (myChart.data.datasets[1].data.length >= myChart.data.labels.length) return;
-
-          myChart.data.datasets[1].data.push(sensor2Data);
-          myChart.update();
-        });
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            min: 0,
+            max: 200,
+            title: {
+              display: true,
+              text: "Ketinggian (cm)"
+            }
+          }
+        }
       }
+    });
 
-      // Jalankan fungsi
-      getData();
-    </script>
-  </head>  
-  <body>
-    <div class="container">
-      <h1 class="title">
-        Monitoring Ketinggian Sungai Belik <br />Di Desa Sagan Caturtunggal Depok Sleman Yogyakarta
-      </h1>
-      <!-- box biru -->
-      <div class="box">
-        <div class="info">
-          <div class="box-container">
-            <div class="left-content">
-              <div class="status-box">
-                <h3>Status</h3>
-                <p><span class="dot red"></span> SIAGA 1: > 170 cm</p>
-                <p><span class="dot orange"></span> SIAGA 2: 140 - 170 cm</p>
-                <p><span class="dot yellow"></span> SIAGA 3: 100 - 140 cm</p>
-                <p><span class="dot green"></span> NORMAL</p>
-              </div>
-              <!-- Tampilan sensor -->
-              <div class="tampilan-sensor1"onclick="openMap('purbonegaran')" style="cursor: pointer;">
-                <h3>Jl. Kampung Purbonegaran</h3>
-                <p>-- cm</p>
-              </div>
-              <div class="tampilan-sensor2"onclick="openMap('samirono')" style="cursor: pointer;">
-                <h3>Jl. Samirono</h3>
-                <p>-- cm</p>
-              </div>
-              <script>
-                function openMap(lokasi) {
-                  let url = "";
+    function updateHimbauan(sensor, value) {
+      const el = document.getElementById(`himbauanText${sensor}`);
+      let text = "";
+      if (value > 170) text = "SIAGA 1: segera evakuasi jika berada di area rawan.";
+      else if (value >= 140) text = "SIAGA 2: debit air meningkat, waspada banjir.";
+      else if (value >= 100) text = "SIAGA 3: ada kenaikan, tetap waspada.";
+      else text = "NORMAL: kondisi aman.";
+      el.innerHTML = text;
+    }
 
-                  if (lokasi === "purbonegaran") {
-                    url = "https://www.google.com/maps/place/Mie+Ayam+Ceker+%26+Angkingan+Sunarno/@-7.7816103,110.3798358,18z/data=!4m6!3m5!1s0x2e7a590019d3a2d3:0xe61a6d7bf464d7b5!8m2!3d-7.7816161!4d110.3806116!16s%2Fg%2F11vs6gdz9m!5m2!1e2!1e4?entry=ttu&g_ep=EgoyMDI1MDUyMS4wIKXMDSoJLDEwMjExNDUzSAFQAw%3D%3D";
-                  } else if (lokasi === "samirono") {
-                    url = "https://www.google.com/maps/place/GHS+(+Gaming+House+of+Sagan)/@-7.7768642,110.3771764,16.5z/data=!4m6!3m5!1s0x2e7a5935362c9e39:0xeaab2b0e0dcfcfae!8m2!3d-7.7789451!4d110.3807421!16s%2Fg%2F11rxp1lmny!5m2!1e2!1e4?entry=ttu&g_ep=EgoyMDI1MDUyMS4wIKXMDSoJLDEwMjExNDUzSAFQAw%3D%3D";
-                  }
+    // Ganti URL ini dengan Web App URL Google Apps Script kamu
+    const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzLfihyhb9Uzcov3H1hLJBaivZbLcEQ0thRnt0awMohH5JwjUZNQ6CuqaQS2jYbqLDFcQ/exec";
 
-                  window.open(url, "_blank");
-                }
-              </script>
-            </div>
-            <!-- Kalender -->
-            <div class="kalender">
-                <input type="date" id="tanggalPicker" />
-                <button onclick="loadHistory()">Tampilkan</button>
-                <button onclick="downloadChartImage()">Download (.png)</button>
-                <button onclick="downloadCSV()">Download (.csv)</button>
-            </div>            
-            <div class="chart-wrapper">
-              <canvas id="myChart"></canvas>
-            <!-- kode js buttom download -->
-            <script>
-              function downloadChartImage() {
-                const link = document.createElement("a");
-                link.href = document.getElementById("myChart").toDataURL("image/png");
-                link.download = "grafik-ketinggian-air.png";
-                link.click();
-              }
+    function kirimKeSpreadsheet(sensor1, sensor2) {
+      fetch(WEBHOOK_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ sensor1, sensor2 })
+      })
+      .then(res => res.json())
+      .then(data => {
+        console.log("Response webhook:", data);
+      })
+      .catch(err => {
+        console.error("Error kirim ke Webhook:", err);
+      });
+    }
 
-              function downloadCSV() {
-                const labels = myChart.data.labels;
-                const data1 = myChart.data.datasets[0].data;
-                const data2 = myChart.data.datasets[1].data;
-                let csv = "Waktu,Sensor 1 (cm),Sensor 2 (cm)\n";
-                for (let i = 0; i < labels.length; i++) {
-                csv += `${labels[i]},${data1[i]},${data2[i] ?? ""}\n`;
-                }
+    function getData() {
+      onValue(ref(db, "Sensor1"), (snap1) => {
+        const sensor1Val = snap1.val();
+        document.querySelector(".tampilan-sensor1 p").innerText = `${sensor1Val.toFixed(2)} cm`;
+        updateHimbauan(1, sensor1Val);
 
-                const blob = new Blob([csv], { type: "text/csv" });
-                const url = window.URL.createObjectURL(blob);
-                const link = document.createElement("a");
-                link.href = url;
-                link.download = "data-ketinggian-air.csv";
-                link.click();
-              }
-            </script>
-            </div>
+        const waktu = new Date().toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit' });
+
+        if (myChart.data.labels.length > 10) {
+          myChart.data.labels.shift();
+          myChart.data.datasets[0].data.shift();
+          myChart.data.datasets[1].data.shift();
+        }
+
+        myChart.data.labels.push(waktu);
+        myChart.data.datasets[0].data.push(sensor1Val);
+
+        onValue(ref(db, "Sensor2"), (snap2) => {
+          const sensor2Val = snap2.val();
+          document.querySelector(".tampilan-sensor2 p").innerText = `${sensor2Val.toFixed(2)} cm`;
+          updateHimbauan(2, sensor2Val);
+
+          myChart.data.datasets[1].data.push(sensor2Val);
+          myChart.update();
+
+          // Kirim data ke spreadsheet lewat webhook
+          kirimKeSpreadsheet(sensor1Val, sensor2Val);
+        }, { onlyOnce: true });
+      });
+    }
+
+    getData();
+  </script>
+</head>
+<body>
+  <header>
+    <h2>Sistem Monitoring Ketinggian Air Sungai Belik</h2>
+    <p>Desa Sagan, Caturtunggal, Depok, Sleman</p>
+  </header>
+
+  <div class="container">
+    <div class="box">
+      <div class="box-container">
+        <div class="left-content">
+          <div class="status-box">
+            <h3>Status</h3>
+            <p><span class="dot red"></span> SIAGA 1: > 170 cm</p>
+            <p><span class="dot orange"></span> SIAGA 2: 140–170 cm</p>
+            <p><span class="dot yellow"></span> SIAGA 3: 100–140 cm</p>
+            <p><span class="dot green"></span> NORMAL</p>
+          </div>
+          <div class="tampilan-sensor1">
+            <h3>Jl. Kampung Purbonegaran</h3>
+            <p>-- cm</p>
+          </div>
+          <div class="tampilan-sensor2">
+            <h3>Jl. Samirono</h3>
+            <p>-- cm</p>
+          </div>
+        </div>
+
+        <div class="chart-section">
+          <div class="kalender">
+            <input type="date" />
+            <button onclick="downloadChart()">Download PNG</button>
+            <button onclick="downloadCSV()">Download CSV</button>
+          </div>
+          <div class="chart-wrapper" style="height: 300px;">
+            <canvas id="myChart"></canvas>
           </div>
         </div>
       </div>
-
-      <!-- HImbauan -->
-      <div class="himbauan">
-      <h4>⚠️ Himbauan!!</h4>
-        <p id="himbauanText"></p>
-        <script>
-          function updateHimbauan(currentHeight) {
-            const himbauan = document.getElementById("himbauanText");
-            let status = "";
-            let isiPesan = "";
-
-              if (currentHeight > 170) {
-                 status = "SIAGA 1 (BAHAYA)";
-                 isiPesan = `Status saat ini <b>${status}</b>, ketinggian air berada pada level kritis dan berpotensi menyebabkan banjir. Segera lakukan evakuasi mandiri jika berada di wilayah rawan.`;
-               } else if (currentHeight >= 140) {
-                 status = "SIAGA 2 (WASPADA)";
-                 isiPesan = `Status saat ini <b>${status}</b>, debit air mengalami peningkatan signifikan. Warga diminta waspada dan bersiap jika sewaktu-waktu harus mengungsi.`;
-               } else if (currentHeight >= 100) {
-                 status = "SIAGA 3 (WASPADA RINGAN)";
-                 isiPesan = `Status saat ini <b>${status}</b>, ketinggian air mulai meningkat. Tetap waspada dan ikuti perkembangan informasi.`;
-               } else {
-                 status = "NORMAL";
-                 isiPesan = `Status saat ini <b>${status}</b>, kondisi aman namun tetap jaga kewaspadaan.`;
-               }
-
-              himbauan.innerHTML = isiPesan;
-            }
-        </script>
-      </div>
     </div>
-  </body>
+
+    <div class="himbauan">
+      <h4>⚠️ Himbauan Sensor 1</h4>
+      <p id="himbauanText1">--</p>
+      <h4>⚠️ Himbauan Sensor 2</h4>
+      <p id="himbauanText2">--</p>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 Tim Monitoring Sungai Belik. Dibangun dengan Firebase & Chart.js.</p>
+  </footer>
+
+  <script>
+    function downloadChart() {
+      const a = document.createElement("a");
+      a.href = document.getElementById("myChart").toDataURL();
+      a.download = "grafik-ketinggian.png";
+      a.click();
+    }
+
+    function downloadCSV() {
+      const labels = myChart.data.labels;
+      const data1 = myChart.data.datasets[0].data;
+      const data2 = myChart.data.datasets[1].data;
+      let csv = "Waktu,Sensor 1,Sensor 2\n";
+      for (let i = 0; i < labels.length; i++) {
+        csv += `${labels[i]},${data1[i] ?? ""},${data2[i] ?? ""}\n`;
+      }
+      const blob = new Blob([csv], { type: "text/csv" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "data-ketinggian.csv";
+      a.click();
+    }
+  </script>
+</body>
 </html>

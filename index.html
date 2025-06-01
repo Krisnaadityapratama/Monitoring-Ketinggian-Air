@@ -70,7 +70,7 @@
     }
 
     // Ganti URL ini dengan Web App URL Google Apps Script kamu
-    const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwWRCGTGprUzVAoSvJDEs2eDMhI_epT1TWnlcdat0GI47LAiFm3_YBOR5ty-_i8HSVt/exec";
+    const WEBHOOK_URL = "https://monitoring-ketinggian-sungai-belik.vercel.app/api/kirim";
 
     function kirimKeSpreadsheet(sensor1, sensor2) {
       fetch(WEBHOOK_URL, {
@@ -79,15 +79,11 @@
           "Content-Type": "application/json"
         },
         body: JSON.stringify({ sensor1, sensor2 })
-      })
-      .then(res => res.json())
-      .then(data => {
-        console.log("Response webhook:", data);
-      })
-      .catch(err => {
-        console.error("Error kirim ke Webhook:", err);
+      }).catch((err) => {
+        console.error("Gagal kirim ke Google Sheet:", err);
       });
     }
+
 
     function getData() {
       onValue(ref(db, "Sensor1"), (snap1) => {

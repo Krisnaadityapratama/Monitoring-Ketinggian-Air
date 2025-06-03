@@ -4,7 +4,6 @@
 #include <ArduinoHttpClient.h>
 #include <SoftwareSerial.h>
 
-// Konfigurasi SIM800
 SoftwareSerial sim800(22, 23); // RX, TX
 
 const char FIREBASE_HOST[] = "ketinggian-air-551c0-default-rtdb.firebaseio.com";
@@ -19,21 +18,11 @@ TinyGsm modem(sim800);
 TinyGsmClientSecure client(modem, 0);
 HttpClient http(client, FIREBASE_HOST, SSL_PORT);
 
-// Konfigurasi Ultrasonik
-const int trigPin = 5;
-const int echoPin = 18;
-
-// Ubah nilai ini sesuai kedalaman sungai aktual dalam cm
-int kedalamanSungai = 200; // contoh: 200 cm = 2 meter
-
 void setup() {
   Serial.begin(115200);
   delay(3000);
   sim800.begin(9600);
   delay(3000);
-
-  pinMode(trigPin, OUTPUT);
-  pinMode(echoPin, INPUT);
 
   Serial.println("Menginisialisasi modem...");
   modem.restart();
@@ -51,43 +40,20 @@ void setup() {
 }
 
 void loop() {
-  int jarak = bacaUltrasonik();
-  int tinggiAir = kedalamanSungai - jarak;
+  int value = random(100, 151);
 
-  // Validasi tinggi air tidak negatif
-  if (tinggiAir < 0) tinggiAir = 0;
+  // Tampilkan nilai sebelum dikirim
+  Serial.print("Nilai yang akan dikirim: ");
+  Serial.println(value);
 
-  // Tampilkan data
-  Serial.print("Jarak sensor ke permukaan air: ");
-  Serial.print(jarak);
-  Serial.println(" cm");
-
-  Serial.print("Tinggi air: ");
-  Serial.print(tinggiAir);
-  Serial.println(" cm");
-
-  // Kirim ke Firebase
-  sendToFirebase(tinggiAir);
+  // Kirim data ke Firebase
+  sendToFirebase(value);
 
   delay(15000); // jeda 15 detik
 }
 
-int bacaUltrasonik() {
-  digitalWrite(trigPin, LOW);
-  delayMicroseconds(2);
-  digitalWrite(trigPin, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(trigPin, LOW);
-
-  long durasi = pulseIn(echoPin, HIGH);
-  int jarak = durasi * 0.034 / 2; // konversi ke cm
-
-  return jarak;
-}
-
 void sendToFirebase(int value) {
-  String sensorID = "Sensor1"; // ubah sesuai device
-  String path = "/" + sensorID + ".json?auth=" + FIREBASE_AUTH;
+  String path = "/Sensor1.json?auth=" + FIREBASE_AUTH;
   String json = "{\"value\": " + String(value) + "}";
 
   if (http.connect(FIREBASE_HOST, SSL_PORT)) {
@@ -96,10 +62,12 @@ void sendToFirebase(int value) {
 
     int statusCode = http.responseStatusCode();
 
+    // Tampilkan kode status (debug)
     Serial.print("Status code: ");
     Serial.println(statusCode);
 
-    if (statusCode == 200 || statusCode == 0 || statusCode == -3) {
+    // Karena SIM800 kadang tidak bisa membaca HTTPS status, anggap statusCode == 0 juga sebagai sukses
+    if (statusCode == 200 || statusCode == 0) {
       Serial.println("Status: BERHASIL dikirim");
     } else {
       Serial.println("Status: GAGAL dikirim");

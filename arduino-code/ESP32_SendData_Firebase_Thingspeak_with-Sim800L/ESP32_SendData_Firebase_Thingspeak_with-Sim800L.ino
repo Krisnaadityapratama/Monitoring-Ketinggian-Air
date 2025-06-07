@@ -8,15 +8,18 @@
 #define MODEM_TX 17
 
 HardwareSerial modemSerial(2); // UART2 (Serial2)
-TinyGsm modem(modemSerial);
-TinyGsmClient client(modem);
-HttpClient http(client, "ketinggian-air-551c0-default-rtdb.firebaseio.com", 80); // HTTP non-SSL
 
-// Firebase dan APN
-const String FIREBASE_AUTH = "1Mc7r6NJT1QBqLlSI14Pq8eDVU4An7FBlitarMPl"; // opsional kalau pakai private access
+const char FIREBASE_HOST[] = "ketinggian-air-551c0-default-rtdb.firebaseio.com";
+const String FIREBASE_AUTH = "1Mc7r6NJT1QBqLlSI14Pq8eDVU4An7FBlitarMPl";
+const int SSL_PORT = 443;
+
 char apn[] = "internet";
 char user[] = "";
 char pass[] = "";
+
+TinyGsm modem(modemSerial);
+TinyGsmClientSecure client(modem, 0);
+HttpClient http(client, FIREBASE_HOST, SSL_PORT);
 
 // Sensor Ultrasonik
 const int trigPin = 5;
@@ -81,26 +84,28 @@ int bacaUltrasonik() {
 }
 
 void sendToFirebase(int value) {
-  String sensorID = "Sensor1";
-  String path = "/" + sensorID + ".json"; // tanpa ?auth untuk testing mode publik
+  String sensorID = "Sensor1"; // ubah sesuai device
+  String path = "/" + sensorID + ".json?auth=" + FIREBASE_AUTH;
   String json = "{\"value\": " + String(value) + "}";
 
-  if (http.post(path, "application/json", json)) {
+  if (http.connect(FIREBASE_HOST, SSL_PORT)) {
+    http.setHttpResponseTimeout(20000);
+    http.patch(path, "application/json", json);
+
     int statusCode = http.responseStatusCode();
-    String response = http.responseBody();
 
     Serial.print("Status code: ");
     Serial.println(statusCode);
-    Serial.print("Response: ");
-    Serial.println(response);
 
-    if (statusCode == 200) {
+    if (statusCode == 200 || statusCode == 0 || statusCode == -3) {
       Serial.println("Status: BERHASIL dikirim");
     } else {
       Serial.println("Status: GAGAL dikirim");
     }
+
     http.stop();
   } else {
     Serial.println("Koneksi HTTP gagal");
   }
 }
+

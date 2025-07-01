@@ -39,17 +39,30 @@ void setup() {
 
   Serial.println("Menginisialisasi modem...");
   modem.restart();
+
   String modemInfo = modem.getModemInfo();
   Serial.print("Modem: ");
   Serial.println(modemInfo);
 
+  Serial.print("Status SIM: ");
+  Serial.println(modem.getSimStatus());
+
+  Serial.print("Sinyal GSM: ");
+  Serial.println(modem.getSignalQuality()); // Cek kualitas sinyal
+
   Serial.print("Menghubungkan ke APN: ");
   Serial.println(apn);
+
   if (!modem.gprsConnect(apn, user, pass)) {
     Serial.println("Gagal konek GPRS!");
-    while (true); // berhenti di sini jika gagal
+    while (true); // berhenti di sini jika gagal koneksi GPRS
   }
+
   Serial.println("GPRS terhubung");
+
+  String ip = modem.getLocalIP();
+  Serial.print("IP Address: ");
+  Serial.println(ip);
 }
 
 void loop() {
@@ -84,7 +97,7 @@ int bacaUltrasonik() {
 }
 
 void sendToFirebase(int value) {
-  String sensorID = "Sensor1"; // ubah sesuai device
+  String sensorID = "Sensor2"; // ubah sesuai device
   String path = "/" + sensorID + ".json?auth=" + FIREBASE_AUTH;
   String json = "{\"value\": " + String(value) + "}";
 
@@ -108,4 +121,3 @@ void sendToFirebase(int value) {
     Serial.println("Koneksi HTTP gagal");
   }
 }
-

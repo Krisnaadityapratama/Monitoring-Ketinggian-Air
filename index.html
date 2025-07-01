@@ -6,7 +6,7 @@
   <title>Monitoring Ketinggian Sungai Belik</title>
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script type="module">
+    <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
@@ -15,7 +15,7 @@
       authDomain: "ketinggian-air-sungai-belik.firebaseapp.com",
       databaseURL: "https://ketinggian-air-sungai-belik-default-rtdb.firebaseio.com/",
       projectId: "ketinggian-air-sungai-belik",
-      storageBucket: "ketinggian-air-sungai-belik.firebasestorage.app",
+      storageBucket: "ketinggian-air-sungai-belik.appspot.com",
       messagingSenderId: "532266336728",
       appId: "1:532266336728:web:a5b12c147a04395ef4b2ad"
     };
@@ -59,37 +59,33 @@
       }
     });
 
-    function updateHimbauan(sensor, value) {
-      const el = document.getElementById(`himbauanText${sensor}`);
-      let text = "";
-      if (value > 170) text = "SIAGA 1: segera evakuasi jika berada di area rawan.";
-      else if (value >= 140) text = "SIAGA 2: debit air meningkat, waspada banjir.";
-      else if (value >= 100) text = "SIAGA 3: ada kenaikan, tetap waspada.";
-      else text = "NORMAL: kondisi aman.";
-      el.innerHTML = text;
+  function updateHimbauan(sensor, value) {
+    const el = document.getElementById(`himbauanText${sensor}`);
+    const alarm = document.getElementById("alarmSound");
+    let text = "";
+
+    if (value > 170) {
+      text = "🔴 SIAGA 1: segera evakuasi jika berada di area rawan.";
+      alarm.play();
+    } else if (value >= 140) {
+      text = "🟠 SIAGA 2: debit air meningkat, waspada banjir.";
+      alarm.pause();
+      alarm.currentTime = 0;
+    } else if (value >= 100) {
+      text = "🟡 SIAGA 3: ada kenaikan, tetap waspada.";
+      alarm.pause();
+      alarm.currentTime = 0;
+    } else {
+      text = "🟢 NORMAL: kondisi aman.";
+      alarm.pause();
+      alarm.currentTime = 0;
     }
+    el.innerHTML = text;
+  }
 
-    // Ganti URL ini dengan Web App URL Google Apps Script kamu yang sudah deploy
-    const WEBHOOK_URL = "https://monitoring-ketinggian-sungai-belik.vercel.app/api/kirim";
 
-    function kirimKeSpreadsheet(sensor1, sensor2) {
-      fetch(WEBHOOK_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ sensor1, sensor2 })
-      }).catch((err) => {
-        console.error("Gagal kirim ke Google Sheet:", err);
-      });
-    }
-
-    // Listener Firebase dipisah supaya gak nested dan gak double listener
     const sensor1Ref = ref(db, "Sensor1");
     const sensor2Ref = ref(db, "Sensor2");
-
-    let lastSensor1 = null;
-    let lastSensor2 = null;
 
     onValue(sensor1Ref, (snap1) => {
       const data = snap1.val();
@@ -99,49 +95,50 @@
       document.querySelector(".tampilan-sensor1 p").innerText = `${sensor1Val.toFixed(2)} cm`;
       updateHimbauan(1, sensor1Val);
 
-      lastSensor1 = sensor1Val;
-      updateChartAndMaybeSend();
+      updateChart(0, sensor1Val);
     });
-
 
     onValue(sensor2Ref, (snap2) => {
       const data = snap2.val();
       if (data === null) return;
-      const sensor2Val = data.value; // Ambil dari objek
+      const sensor2Val = data.value;
 
       document.querySelector(".tampilan-sensor2 p").innerText = `${sensor2Val.toFixed(2)} cm`;
       updateHimbauan(2, sensor2Val);
 
-      lastSensor2 = sensor2Val;
-      updateChartAndMaybeSend();
+      updateChart(1, sensor2Val);
     });
 
+    function updateChart(sensorIndex, value) {
+      const waktu = new Date().toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit' });
 
-    function updateChartAndMaybeSend() {
-      if (lastSensor1 === null || lastSensor2 === null) return;
+      // Cek apakah label waktu terakhir sama dengan waktu sekarang
+      const lastLabel = myChart.data.labels[myChart.data.labels.length - 1];
 
-      if (myChart.data.labels.length > 10) {
-        myChart.data.labels.shift();
-        myChart.data.datasets[0].data.shift();
-        myChart.data.datasets[1].data.shift();
+      if (lastLabel === waktu) {
+        const idx = myChart.data.labels.length - 1;
+        if (sensorIndex === 0) myChart.data.datasets[0].data[idx] = value;
+        if (sensorIndex === 1) myChart.data.datasets[1].data[idx] = value;
+      } else {
+        if (myChart.data.labels.length >= 10) {
+          myChart.data.labels.shift();
+          myChart.data.datasets[0].data.shift();
+          myChart.data.datasets[1].data.shift();
+        }
+        myChart.data.labels.push(waktu);
+        myChart.data.datasets[0].data.push(sensorIndex === 0 ? value : null);
+        myChart.data.datasets[1].data.push(sensorIndex === 1 ? value : null);
       }
 
-      const waktu = new Date().toLocaleTimeString("id-ID", { hour: '2-digit', minute: '2-digit' });
-      myChart.data.labels.push(waktu);
-      myChart.data.datasets[0].data.push(lastSensor1);
-      myChart.data.datasets[1].data.push(lastSensor2);
       myChart.update();
-
-      kirimKeSpreadsheet(lastSensor1, lastSensor2);
-
-      // reset agar tidak kirim data duplikat sebelum ada update baru
-      lastSensor1 = null;
-      lastSensor2 = null;
     }
-
   </script>
+
 </head>
 <body>
+
+  <audio id="alarmSound" src="alarm.mp3" preload="auto"></audio>
+
   <header>
     <h2>Sistem Monitoring Ketinggian Air Sungai Belik</h2>
     <p>Desa Iromejan dan Desa Sagan, Caturtunggal, Depok, Sleman</p>

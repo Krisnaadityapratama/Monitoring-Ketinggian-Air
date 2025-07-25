@@ -23,7 +23,7 @@ const char* botToken = "7611350014:AAGeMt1JbERea90GC_V0BrXKGG2naY1phk4";  // Tok
 const char* chat_id = "-1002533311710";  // ID Group Telegram Anda
 
 // Threshold ketinggian yang ingin dipantau
-const int thresholdTinggiAir = 170;  // Dalam cm, misalnya jika tinggi air melebihi 100 cm, baru dikirim ke Telegram
+const int thresholdTinggiAir = 100;  // Dalam cm, misalnya jika tinggi air melebihi 100 cm, baru dikirim ke Telegram
 
 WiFiClientSecure client;
 UniversalTelegramBot bot(botToken, client);
@@ -117,7 +117,7 @@ int bacaUltrasonik() {
 }
 
 void sendToFirebase(int value) {
-  String sensorID = "Sensor2";
+  String sensorID = "Sensor1";
   String path = "/" + sensorID + ".json?auth=" + FIREBASE_AUTH;
   String json = "{\"value\": " + String(value) + "}";
 

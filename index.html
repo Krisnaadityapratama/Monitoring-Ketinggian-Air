@@ -57,7 +57,7 @@
               max: 200,
               title: {
                 display: true,
-                text: "Ketinggian (cm)",
+                text: "High (cm)",
               },
             },
           },
@@ -70,14 +70,15 @@
         let text = "";
 
         if (value > 120) {
-          text = "🔴 SIAGA 1: segera evakuasi jika berada di area rawan.";
+          text =
+            "🔴 ALERT 1: Evacuate immediately if you are in a vulnerable area.";
           alarm.play();
         } else if (value >= 100) {
-          text = "🟠 SIAGA 2: debit air meningkat, waspada banjir.";
+          text = "🟠 ALERT 2: Water levels rising, be alert for flooding.";
           alarm.pause();
           alarm.currentTime = 0;
         } else if (value >= 80) {
-          text = "🟡 SIAGA 3: ada kenaikan, tetap waspada.";
+          text = "🟡 ALERT LEVEL 3: There is an increase, remain vigilant.";
           alarm.pause();
           alarm.currentTime = 0;
         } else {
@@ -149,8 +150,8 @@
     <audio id="alarmSound" src="alarm.mp3" preload="auto"></audio>
 
     <header>
-      <h2>Sistem Monitoring Ketinggian Air Sungai Belik</h2>
-      <p>Desa Iromejan dan Desa Sagan, Caturtunggal, Depok, Sleman</p>
+      <h2>Belik River Water Level Monitoring System</h2>
+      <p>Iromejan Village and Sagan Village, Caturtunggal, Depok, Sleman</p>
     </header>
 
     <div class="container">
@@ -159,9 +160,9 @@
           <div class="left-content">
             <div class="status-box">
               <h3>Status</h3>
-              <p><span class="dot red"></span> SIAGA 1: > 120 cm</p>
-              <p><span class="dot orange"></span> SIAGA 2: 100–120 cm</p>
-              <p><span class="dot yellow"></span> SIAGA 3: 80–100 cm</p>
+              <p><span class="dot red"></span> ALERT LEVEL 1: > 120 cm</p>
+              <p><span class="dot orange"></span> ALERT LEVEL 2: 100–120 cm</p>
+              <p><span class="dot yellow"></span> ALERT LEVEL 3: 80–100 cm</p>
               <p><span class="dot green"></span> NORMAL</p>
             </div>
             <div class="tampilan-sensor1">
@@ -204,16 +205,16 @@
       </div>
 
       <div class="himbauan">
-        <h4>⚠️ Himbauan Jl. Kampung Purbonegaran (Sensor 1)</h4>
+        <h4>⚠️ Notice for Jl. Kampung Purbonegara (Sensor 1)</h4>
         <p id="himbauanText1">--</p>
-        <h4>⚠️ Himbauan Jl. Samirono (Sensor 2)</h4>
+        <h4>⚠️ Notice for Jl. Samirono (Sensor 2)</h4>
         <p id="himbauanText2">--</p>
       </div>
     </div>
 
     <footer>
       <p>
-        &copy; 2025 Tim Monitoring Sungai Belik. Dibangun dengan Firebase &
+        &copy; 2025 Belik River Monitoring Team. Built with Firebase &
         Chart.js.
       </p>
     </footer>
